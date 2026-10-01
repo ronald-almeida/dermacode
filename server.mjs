@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { AMOUNT, salePayload, signTransaction, verifyTransaction } from './checkout.mjs';
 const publicDir = new URL('./public/',import.meta.url);
-const mime = {'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png'};
+const mime = {'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.png':'image/png','.svg':'image/svg+xml'};
 const attempts = new Map(); const requests = new Map();
 const cleanup = setInterval(() => { for(const [k,v] of attempts) if(v.expires<Date.now()) attempts.delete(k); for(const [k,v] of requests) if(v.expires<Date.now()) requests.delete(k); },60000); cleanup.unref();
 function json(res,status,body){ res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(body)); }
@@ -43,7 +43,7 @@ export const server=http.createServer(async(req,res)=>{
       return json(res,404,{error:'Não encontrado.'});
     }
     if(req.method!=='GET'&&req.method!=='HEAD')return json(res,405,{error:'Método não permitido.'});
-    const files={'/':'index.html','/styles.css':'styles.css','/app.js':'app.js','/assets/banner.png':'assets/banner.png','/assets/produto.png':'assets/produto.png'};
+    const files={'/':'index.html','/styles.css':'styles.css','/reference.css':'reference.css','/app.js':'app.js','/assets/banner.png':'assets/banner.png','/assets/produto.png':'assets/produto.png','/assets/qrcode.svg':'assets/qrcode.svg'};
     const file=files[url.pathname];if(!file)return json(res,404,{error:'Página não encontrada.'});
     const content=await readFile(new URL(file,publicDir));const extension=file.slice(file.lastIndexOf('.'));res.writeHead(200,{'Content-Type':mime[extension],'Cache-Control':file.startsWith('assets/')?'public, max-age=86400':'no-cache'});res.end(req.method==='HEAD'?undefined:content);
   }catch{json(res,500,{error:'Não foi possível concluir. Tente novamente mais tarde.'});}
